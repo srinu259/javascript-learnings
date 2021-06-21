@@ -1,0 +1,22 @@
+//reflection example
+var person = {
+    firstname: 'Default',
+    lastname: 'Default',
+    getfullname: function(){
+        return this.firstname+' '+this.lastname;
+    }
+}
+
+var john = {
+    firstname: 'John',
+    lastname: 'Doe'
+}
+
+//never ever do this
+john.__proto__ = person;
+
+for(property in john){
+    if (john.hasOwnProperty(property)){
+        console.log(john[property]);
+    }
+}

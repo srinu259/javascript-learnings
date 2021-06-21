@@ -1,0 +1,22 @@
+/* underscore.js */
+ /* var root = typeof self == 'object' && self.self === self && self ||
+            typeof global == 'object' && global.global === global && global ||
+            this ||
+            {};
+*/
+var root1 = typeof self == 'object';
+var root2 = self.self === self;
+var root3 = self;
+var root4 = true && true && self;
+
+console.log('root1 '+root1);
+console.log('root2 '+root2);
+console.log('root3 '+root3);
+console.log('root4 '+root4);
+
+var root5 = typeof global == 'object' && global.global === global && global;
+console.log('root5 '+root5);
+
+var root6 = self || false || this || {};
+console.log('root6 '+root6);
+

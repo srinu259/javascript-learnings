@@ -1,0 +1,10 @@
+function greet(whattosay){
+    console.log(arguments);
+    return function(name){
+        console.log(arguments);
+        console.log(whattosay+" - "+name);
+    }
+}
+
+var sayHi = greet('Hi')
+sayHi('Tony');

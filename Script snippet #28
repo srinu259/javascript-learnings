@@ -1,0 +1,22 @@
+function getCPU(limit,fn){
+    availableValues = [];
+    for(var i=1; i<= limit; i++){
+        availableValues.push({'value' : i+fn("AGB"), 'displayName' : i+fn});
+    }
+    return availableValues;
+}
+
+function checkUnit(unit){
+    if (unit == undefined) 
+       return ""
+    else 
+       return " "+unit
+}
+
+var arr5 = getCPU(5, checkUnit("GB"));
+console.log(arr5);
+
+
+//getCPU(5)
+//console.log(checkUnit(""));
+ //# sourceURL=snippet:///Script%20snippet%20%2328

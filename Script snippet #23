@@ -1,0 +1,169 @@
+// Azure APIs
+// Dynamic list response.
+
+//get input parameters and assign to variables
+var orgName =  'MY_ORG' //request.orgName
+var locCode = 'WUS' //request.locationCode
+var subType = 'nonprod'  //request.subscriptionType
+var subId = '535144a8-dcfc-4f00-94bd-1f6d26998493' //request.subscriptionId
+var subTypeStr = "";
+if (subType == "nonprod") {subTypeStr = "az-np"}
+if (subType == "prod") {subTypeStr = "az-pd"}
+
+var subnetStr = "";
+if ((orgName.indexOf("C3-MONITORING-ORG") > -1)) {
+    subnetStr = "monitoring";
+} else if ((orgName.indexOf("C3-SECURITY-ORG") > -1)) {
+    subnetStr = "security";  
+} else {
+    subnetStr = "none";  
+}
+
+//get Azure Token
+var tokenRequest = {
+    url: 'https://login.windows.net/subId/token',
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    data: 'grant_type=client_credentials&client_id=xxxxxxxxxx&client_secret=xxxxxxxxxxxxxD&resource=https%3A%2F%2Fmanagement.azure.com%2F'
+};
+var tokenResponse = HTTPClient.call(tokenRequest);
+
+var tokenResponseBody;
+if (tokenResponse.error) {
+    tokenResponseBody = "error: "+tokenResponse.error;
+} else {
+    tokenResponseBody = tokenResponse.body;
+    var tokenJsonBody = JSON.parse(tokenResponseBody);
+    var token = tokenJsonBody.access_token;
+}
+
+//Get all subnets for subscription
+if (tokenResponse.statusCode == 200){
+	//Get Subscription Name from ID
+	var subscriptionReq = {
+		url: 'https://management.azure.com/subscriptions/'+subId+'?api-version=2018-08-01',
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json',
+			'Authorization': 'Bearer '+token
+		}
+	};
+	var subscriptionResp = HTTPClient.call(subscriptionReq);
+	if (subscriptionResp.statusCode == 200) {
+		var subscriptionResult = JSON.parse(subscriptionResp.body);
+		var subscriptionName = subscriptionResult.displayName;
+		//Get Org resource group get location from that.
+		var resGrpReq = {
+			url: 'https://management.azure.com/subscriptions/'+subId+'/resourceGroups/'+locCode+'_'+orgName+'?api-version=2018-08-01',
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': 'Bearer '+token
+			}
+		};
+		var resGrpResp = HTTPClient.call(resGrpReq);
+		if (resGrpResp.statusCode == 200) {
+			var resGrpResult = JSON.parse(resGrpResp.body);
+			var loc = resGrpResult.location;
+			var subNameSplit = subscriptionName.split("-");
+			var vNetRgName = subTypeStr+'-'+loc+'-'+subNameSplit[2]+'-network';
+			var vNetName = vNetRgName+'-vnet';
+			var subnetsReq = {
+				url: 'https://management.azure.com/subscriptions/'+subId+'/resourceGroups/'+vNetRgName+'/providers/Microsoft.Network/virtualNetworks/'+vNetName+'/subnets?api-version=2018-08-01',
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': 'Bearer '+token
+				}
+			};
+			var subnetsResp = HTTPClient.call(subnetsReq);
+
+			var subnetsResult;
+			if (subnetsResp.error) {
+				subnetsResult = "error: "+subnetsResp.error;
+				availableValues = [{
+					'value': subnetsResult,
+					'displayName': 'Error Encountered',
+					'description': 'Error Message'
+				}];
+			} else {
+				subnetsResult = JSON.parse(subnetsResp.body);
+				var subnetsArr = subnetsResult.value;
+				var arrLength = subnetsArr.length;
+				var subnetsArray = [];
+				for (i=0; i < arrLength; i++) {
+					var subnetName = subnetsArr[i].name;
+					var addressPrefix = subnetsArr[i].properties.addressPrefix; 
+					if (((subnetName.indexOf(orgName)) > -1) || ((subnetName.indexOf(subnetStr)) > -1)) {
+						var ipConfigsArr = subnetsArr[i].properties.ipConfigurations;
+						if (ipConfigsArr) {
+							var consumedIPs = ipConfigsArr.length;
+							var cidr = (addressPrefix.split("/"))[1];
+							var hostsNum;
+							switch (cidr) {
+								// hostsNum = total addresses -minus- 5 overhead addresses
+								case "16":
+									hostsNum = parseInt("65531");
+									break;
+								case "17":
+									hostsNum = parseInt("32763");
+									break;
+								case "18":
+									hostsNum = parseInt("16379");
+									break;
+								case "19":
+									hostsNum = parseInt("8192");
+									break;
+								case "20":
+									hostsNum = parseInt("4096");
+									break;
+								case "21":
+									hostsNum = parseInt("2048");
+									break;
+								case "22":
+									hostsNum = parseInt("1024");
+									break;
+								case "23":
+									hostsNum = parseInt("512");
+									break;
+								case "24":
+									hostsNum = parseInt("256");
+									break;
+								case "25":
+									hostsNum = parseInt("128");
+									break;
+								case "26":
+									hostsNum = parseInt("64");
+									break;
+								case "27":
+									hostsNum = parseInt("32");
+									break;
+								case "28":
+									hostsNum = parseInt("16");
+									break;
+								case "29":
+									hostsNum = parseInt("8");
+									break;
+								case "30":
+									hostsNum = parseInt("0");
+									break;
+							}
+							var remainIPs = hostsNum - consumedIPs;
+							subnetsArray.push(
+								{
+								'value': subnetName,
+								'displayName': addressPrefix+' ('+remainIPs+' remain)',
+								'description': 'Subnet Name & Address Prefix'
+								}
+							);
+						}
+					}
+				}
+
+			availableValues = subnetsArray;
+			}
+		}
+	}
+}

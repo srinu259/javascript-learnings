@@ -1,0 +1,12 @@
+// everthing is either an object or a primitive
+var a = {};
+var b = function(){};
+var c = [];
+
+var aProto = a.__proto__;
+var bProto = b.__proto__;
+var cProto = c.__proto__;
+
+console.log(aProto);
+console.log(bProto);
+console.log(cProto);

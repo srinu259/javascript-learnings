@@ -1,0 +1,10 @@
+//setTimeout example
+function SayHelloLater(){
+    var greeting = 'Hello';
+
+    setTimeout(function(){
+        console.log(greeting);
+    }, 3000);
+}
+
+SayHelloLater();

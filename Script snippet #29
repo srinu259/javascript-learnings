@@ -1,0 +1,11 @@
+var properties = "customizationTemplateName;PS-Lab-AMS-Windows-Fixed-Updated|isoimages;|dhcp;true";
+var txt = "";
+var res = properties.split("|");
+var finalRslt = res.forEach(myFunction);
+console.log(txt.replace(/\,$/, ''));
+//console.log(txt.slice(0, txt.lastIndexOf(",")));
+
+function myFunction(value, index, array) {
+  value = value.split(";");
+  txt = txt + JSON.stringify(value[0]) +":"+JSON.stringify(value[1]) + ","; 
+}

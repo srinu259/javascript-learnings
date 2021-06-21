@@ -1,0 +1,15 @@
+//callback function example
+function tellMeWhenDone(callback){
+
+    var a = '100';
+    var b = 200;
+    callback();
+}
+
+tellMeWhenDone(function(){
+    console.log('I am done!');
+})
+
+tellMeWhenDone(function(){
+    console.log('All is done!');
+})

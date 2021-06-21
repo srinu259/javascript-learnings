@@ -1,0 +1,15 @@
+var c = {
+	name: 'A C Object',
+	log: function() {
+		this.name = 'Updated C object';
+		console.log(this);
+
+		var d = function(newname){
+			this.name = newname;
+		}
+		d('a new updated c object');
+		console.log(this);
+	}
+}
+
+c.log();

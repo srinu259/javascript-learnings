@@ -1,0 +1,11 @@
+function a(){
+    console.log(this);
+}
+
+a();
+
+var b = function(){
+    console.log(this);
+}
+
+b();

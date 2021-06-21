@@ -1,0 +1,61 @@
+/* demonstration of underscore.js extend method
+extend adds all the properties and methods of passed in objects to a single object
+extend mutates the source object (first object)
+*/
+
+var aObj = {
+    firstName: "Default", 
+    lastName: "Default", 
+    getFullName: function(){ 
+        return this.firstName+' '+ this.lastName
+        }
+};
+
+var bObj = {
+    getFirstName: function(){
+        console.log(this);
+        return this.firstName;
+    }
+};
+
+var cObj = {
+    getLastName: function(){
+        return this.lastName;
+    }
+}
+
+//with underscore
+_.extend(aObj, bObj, cObj);
+
+var uscore = {};
+
+uscore.uKeys = function(obj) {
+    //if (!uscore.isObject(obj)) return [];
+    var keys = [];
+    for (var key in obj) keys.push(key);
+    return keys;
+  };
+
+uscore.uCreateAssigner = function(keysFunc, defaults) {
+    return function(obj) {
+      var length = arguments.length;
+      console.log('uCreateAssigner-1'+length);
+      if (defaults) obj = Object(obj);
+      if (length < 2 || obj == null) return obj;
+      for (var index = 1; index < length; index++) {
+        console.log('source '+arguments[index]);
+        var source = arguments[index],
+            keys = keysFunc(source),
+            l = keys.length;
+        for (var i = 0; i < l; i++) {
+          var key = keys[i];
+          if (!defaults || obj[key] === void 0) obj[key] = source[key];
+        }
+      }
+      return obj;
+    };
+  };  
+
+//uscore.extend = uscore.uCreateAssigner(uscore.uKeys);
+var uTest1 = uCreateAssigner(uscore.uKeys)(aObj, bObj, cObj);
+console.log(uTest1);

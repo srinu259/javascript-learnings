@@ -1,0 +1,25 @@
+//azure get storage account-1 [didnt use this in OO flow]
+
+function mapForEach(arr, fn){
+    var nicList = [];
+    for(var i=0; i<arr.length; i++){
+        var item = arr[i];
+        var nic = {};
+        nic.subscriptionId = item.substring(item.indexOf("subscriptions/")+15,item.indexOf("/resourceGroups"));
+        nic.resourceGroup = item.substring(item.indexOf("resourceGroups/")+15,item.indexOf("/providers"));
+        nic.nicName = item.substring(item.lastIndexOf("/")+1);
+        nicList.push(fn(nic));
+
+    }
+    return nicList;
+}
+
+var arr = [
+  "/subscriptions/95915675-d4ee-4c32-b837-6542afb284b2/resourceGroups/az-np-eastus2-sub05-inf/providers/Microsoft.Network/networkInterfaces/aznpea02us05lb01-nic0",
+  "/subscriptions/95915675-d4ee-4c32-b837-6542afb284b2/resourceGroups/az-np-eastus2-sub05-inf/providers/Microsoft.Network/networkInterfaces/aznpea02us05lb01-nic1"
+]
+
+var nicList = mapForEach(arr, function(item){
+    return item;
+})
+console.log(nicList);

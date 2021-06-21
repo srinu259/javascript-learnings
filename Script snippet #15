@@ -1,0 +1,30 @@
+// JSON.parse parses a JSON object to JavaScript object
+console.log("----- JSON.parse converts JSON string to JavaScript object -----");
+var nicJson = JSON.parse("{\"subscriptionId\": \"5915675-d4ee-4c32-b837-6542afb284b2\",\"resourceGroup\": \"az-np-eastus2-sub05-inf\",\"nicName\": \"aznpea02us05lb01-nic0\"}");
+//console.log(nicJson);
+console.log(nicJson["subscriptionId"]);
+console.log(nicJson.resourceGroup);
+console.log(nicJson.nicName);
+console.log("-------------------");
+
+/* BELOW IS THE JavaScript Object */
+var nicJSobject = 
+{subscriptionId: "5915675-d4ee-4c32-b837-6542afb284b2", resourceGroup: "az-np-eastus2-sub05-inf", nicName: "aznpea02us05lb01-nic0"};
+console.log(nicJSobject.subscriptionId);
+console.log(nicJSobject["subscriptionId"]);
+console.log(nicJSobject[subscriptionId]); //-> THIS DOESNOT WORK
+console.log(nicJSobject.resourceGroup);
+console.log(nicJSobject.nicName);
+console.log("-------------------");
+
+// JSON.stringify serializes a JavaScript object to JSON string
+console.log("----- JSON.stringify serializes a JavaScript object to JSON string -----");
+var nicStringify = JSON.stringify({subscriptionId: "5915675-d4ee-4c32-b837-6542afb284b2", resourceGroup: "az-np-eastus2-sub05-inf", nicName: "aznpea02us05lb01-nic0"});
+console.log(JSON.parse(nicStringify).subscriptionId);
+console.log(nicStringify["subscriptionId"]);
+console.log(nicStringify.resourceGroup);
+console.log(nicStringify.nicName);
+console.log("-------------------");
+
+
+
